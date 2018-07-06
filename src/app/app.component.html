@@ -1,20 +1,175 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-</div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
+<div class="container">
+  <!-- <div class="row title" >
+      <h1>Paiement De Facture</h1>
+  </div> -->
+  <div class="row">
+      <tabset #staticTabs style="width:100%; text-align:center;">
+          <tab heading="TNT">
+                <div class="col-12" *ngIf="etapetnt==1">
+                    <form  style="width:50%; margin-left:25%; margin-top:4%; border: 1px solid #36a9e0;padding: 8%;border-radius: 4rem 0rem;">
+                        <div class="form-group">
+                          <label for="formGroupExampleInput">Numéro carte ou numéro téléphone propre</label>
+                          <input style="border-radius: 2rem 0rem 2rem 2rem;" stype="text" class="form-control input-sm" id="numero" placeholder="numero" [(ngModel)]="this.numero" name="numero">
+                        </div>
+                        <div class="form-group">
+                          <input style="border-radius: 2rem 0rem 2rem 2rem; margin-top: 8%;" type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="rechercher" (click)="infoNumeroTnt()">
+                        </div>
+                      </form>
+                </div>
 
+                <div class="col-12" *ngIf="etapetnt==2">
+                    <form  style="width:80%; margin-left:10%; margin-top:4%; border: 1px solid #36a9e0;padding: 6%;border-radius: 4rem 0rem;"  class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="formGroupExampleInput">Nom Client</label>
+                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="nom" placeholder="nom" [(ngModel)]="this.nom" name="nom">
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="formGroupExampleInput">Prénom Client</label>
+                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="prenom" placeholder="prenom" [(ngModel)]="this.prenom" name="prenom">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="formGroupExampleInput">Téléphone Client</label>
+                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="tel" placeholder="tel" [(ngModel)]="this.tel" name="tel">
+                            </div>
+                        </div>
+  
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="formGroupExampleInput">Numéro Chip </label>
+                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="numeroChip" placeholder="numeroChip" [(ngModel)]="this.numeroChip" name="numeroChip">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="formGroupExampleInput">Numéro Carte</label>
+                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="numeroCarte" placeholder="numeroCarte" [(ngModel)]="this.numeroCarte" name="numeroCarte">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="button" class="btn btn-default btn-sm" id="formGroupExampleInput2" value="retoure" (click)="etapetnt=1">
+                                <input style="border-radius: 2rem 0rem 2rem 2rem; margin-left: 6%;" type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="rechercher" (click)="openModal(template)">
+                            </div>
+                        </div>
+                      </form>
+                </div>
+
+                <div class="col-12" *ngIf="etapetnt==3">
+                    <form  style="width:50%; margin-left:25%; margin-top:6%; text-align:center; border: 1px solid #36a9e0;padding: 6%;border-radius: 4rem 0rem;"  class="row">
+                        <div class="col-12">
+                              <h5><b>Vous allez payer <span style="color:red;">4750</span> fca</b></h5>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-group row">
+                                <div class="form-group row">
+                                    <div class="col-12">
+                                        <label for="formGroupExampleInput">Quel est votre mode de paiement ?</label>
+                                    </div>
+                                    <div class="col-12">
+                                        <form style="width: 100%;">
+                                            <div class="form-check form-check-inline" style="width: 100%;">
+                                                <input  [(ngModel)]="this.OrangeMoneyRadio" class="form-check-input" type="radio" name="modedepaiement" id="OrangeMoneyRadio" value="OrangeMoneyRadio" checked>
+                                                <label class="form-check-label" for="OrangeMoney">
+                                                    Orange Money
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-check-inline" style="width: 100%;">
+                                                <input [(ngModel)]="this.tigocashRadio" class="form-check-input" type="radio" name="modedepaiement" id="tigocashRadio" value="tigocashRadio">
+                                                <label class="form-check-label" for="tigocashRadio">
+                                                    Tiguo Cash
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-check-inline" style="width: 100%;">
+                                                <input  [(ngModel)]="this.emoneyRadio" class="form-check-input" type="radio" name="modedepaiement" id="emoneyRadio" value="emoneyRadio">
+                                                <label class="form-check-label" for="emoneyRadio">
+                                                    E-MONEY
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-check-inline" style="width: 100%;">
+                                                <input [(ngModel)]="this.postcashRadio" class="form-check-input" type="radio" name="modedepaiement" id="postcashRadio" value="postcashRadio">
+                                                <label class="form-check-label" for="postcashRadio">
+                                                    POSTCASH
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-check-inline" style="width: 100%;">
+                                                <input [(ngModel)]="this.wizallRadio" class="form-check-input" type="radio" name="modedepaiement" id="wizallRadio" value="wizallRadio">
+                                                <label class="form-check-label" for="wizallRadio">
+                                                    WIZALL
+                                                </label>
+                                            </div>
+                                          </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group row">
+                                <div class="col-5">
+                                    <label for="formGroupExampleInput">Numéro Associé</label>
+                                </div>
+                                <div class="col-7">
+                                    <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="numeroassocie" placeholder="numeroassocie" [(ngModel)]="this.numeroassocie" name="numeroassocie">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="button" class="btn btn-default btn-sm" id="formGroupExampleInput2" value="retoure" (click)="etapetnt=2">
+                                <input style="border-radius: 2rem 0rem 2rem 2rem;    margin-left: 6%; " type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="rechercher" (click)="validerpaiementTnt();">
+                            </div>
+                        </div>
+                      </form>
+                </div>
+          </tab>
+          <tab heading="SENELEC">SENELEC</tab>
+          <tab heading="CANAL">CANAL</tab>
+          <tab heading="WOYOFAL">WOYOFAL</tab>
+          <tab heading="SDE">SDE</tab>
+        </tabset>
+  </div>
+</div>
+
+<!-- ------------------------------------------------
+                               Modales
+ ----------------------------------------------------- -->
+
+ <ng-template #template>
+    <div class="modal-header">
+      <h4 class="modal-title pull-left">Durée</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div class="container">
+            <div class="row">
+                <div class="form-group col-12">
+                    <label for="formGroupExampleInput">Nombre De Mois </label>
+                    <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="nombreDeMois" placeholder="nombreDeMois" [(ngModel)]="this.nombreDeMois" name="nombreDeMois">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group  col-12">
+                    <label for="formGroupExampleInput">Type De Bouquet</label>
+                    <select   style="border-radius: 2rem 0rem 2rem 2rem;" class="form-control input-sm" id="typeDeBouquet" placeholder="numero Carte" [(ngModel)]="this.typeDeBouquet" name="typeDeBouquet">
+                        <option _ngcontent-c9="">Maanaa</option>
+                        <option _ngcontent-c9="">Boul khool</option>
+                        <option _ngcontent-c9="">Maanaa + Boul khool</option>
+                    </select>
+                  </div>
+            </div>
+            <div class="row">
+                <div class="form-group  col-12">
+                    <input style="border-radius: 2rem 0rem 2rem 2rem; float:right;" type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="rechercher" (click)="etapetnt=3;modalRef.hide()">
+                </div>
+            </div>
+        </div>
+    </div>
+  </ng-template>
