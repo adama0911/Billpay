@@ -5,6 +5,12 @@
   <div class="row">
       <tabset #staticTabs style="width:100%; text-align:center;">
           <tab heading="TNT">
+                <div class="col-12" *ngIf="erreur!='undefined'" style="color:red;">
+                        {{this.erreur}}
+                </div>
+                <div class="col-12" *ngIf="sucess!='undefined'" style="color:red;">
+                        {{this.success}}
+                </div>
                 <div class="col-12" *ngIf="etapetnt==1">
                     <form  style="width:50%; margin-left:25%; margin-top:4%; border: 1px solid #36a9e0;padding: 8%;border-radius: 4rem 0rem;">
                         <div class="form-group">
@@ -54,7 +60,7 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <input style="border-radius: 2rem 0rem 2rem 2rem;" type="button" class="btn btn-default btn-sm" id="formGroupExampleInput2" value="retoure" (click)="etapetnt=1">
-                                <input style="border-radius: 2rem 0rem 2rem 2rem; margin-left: 6%;" type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="rechercher" (click)="openModal(template)">
+                                <input style="border-radius: 2rem 0rem 2rem 2rem; margin-left: 6%;" type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="valider" (click)="openModal(template)">
                             </div>
                         </div>
                       </form>
@@ -63,7 +69,7 @@
                 <div class="col-12" *ngIf="etapetnt==3">
                     <form  style="width:50%; margin-left:25%; margin-top:6%; text-align:center; border: 1px solid #36a9e0;padding: 6%;border-radius: 4rem 0rem;"  class="row">
                         <div class="col-12">
-                              <h5><b>Vous allez payer <span style="color:red;">4750</span> fca</b></h5>
+                              <h5><b>Vous allez payer <span style="color:red;">{{montant}}</span> fca</b></h5>
                         </div>
 
                         <div class="col-12">
@@ -75,31 +81,31 @@
                                     <div class="col-12">
                                         <form style="width: 100%;">
                                             <div class="form-check form-check-inline" style="width: 100%;">
-                                                <input  [(ngModel)]="this.OrangeMoneyRadio" class="form-check-input" type="radio" name="modedepaiement" id="OrangeMoneyRadio" value="OrangeMoneyRadio" checked>
+                                                <input  [(ngModel)]="this.OrangeMoneyRadio" class="form-check-input" type="radio" name="modedepaiement" id="OrangeMoneyRadio" value="1" checked>
                                                 <label class="form-check-label" for="OrangeMoney">
                                                     Orange Money
                                                 </label>
                                             </div>
                                             <div class="form-check form-check-inline" style="width: 100%;">
-                                                <input [(ngModel)]="this.tigocashRadio" class="form-check-input" type="radio" name="modedepaiement" id="tigocashRadio" value="tigocashRadio">
+                                                <input [(ngModel)]="this.tigocashRadio" class="form-check-input" type="radio" name="modedepaiement" id="tigocashRadio" value="2">
                                                 <label class="form-check-label" for="tigocashRadio">
                                                     Tiguo Cash
                                                 </label>
                                             </div>
                                             <div class="form-check form-check-inline" style="width: 100%;">
-                                                <input  [(ngModel)]="this.emoneyRadio" class="form-check-input" type="radio" name="modedepaiement" id="emoneyRadio" value="emoneyRadio">
+                                                <input  [(ngModel)]="this.emoneyRadio" class="form-check-input" type="radio" name="modedepaiement" id="emoneyRadio" value="3">
                                                 <label class="form-check-label" for="emoneyRadio">
                                                     E-MONEY
                                                 </label>
                                             </div>
                                             <div class="form-check form-check-inline" style="width: 100%;">
-                                                <input [(ngModel)]="this.postcashRadio" class="form-check-input" type="radio" name="modedepaiement" id="postcashRadio" value="postcashRadio">
+                                                <input [(ngModel)]="this.postcashRadio" class="form-check-input" type="radio" name="modedepaiement" id="postcashRadio" value="4">
                                                 <label class="form-check-label" for="postcashRadio">
                                                     POSTCASH
                                                 </label>
                                             </div>
                                             <div class="form-check form-check-inline" style="width: 100%;">
-                                                <input [(ngModel)]="this.wizallRadio" class="form-check-input" type="radio" name="modedepaiement" id="wizallRadio" value="wizallRadio">
+                                                <input [(ngModel)]="this.wizallRadio" class="form-check-input" type="radio" name="modedepaiement" id="wizallRadio" value="5">
                                                 <label class="form-check-label" for="wizallRadio">
                                                     WIZALL
                                                 </label>
@@ -122,7 +128,7 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <input style="border-radius: 2rem 0rem 2rem 2rem;" type="button" class="btn btn-default btn-sm" id="formGroupExampleInput2" value="retoure" (click)="etapetnt=2">
-                                <input style="border-radius: 2rem 0rem 2rem 2rem;    margin-left: 6%; " type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="rechercher" (click)="validerpaiementTnt();">
+                                <input style="border-radius: 2rem 0rem 2rem 2rem;    margin-left: 6%; " type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="valider" (click)="validerpaiementTnt();">
                             </div>
                         </div>
                       </form>
@@ -152,24 +158,28 @@
             <div class="row">
                 <div class="form-group col-12">
                     <label for="formGroupExampleInput">Nombre De Mois </label>
-                    <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="nombreDeMois" placeholder="nombreDeMois" [(ngModel)]="this.nombreDeMois" name="nombreDeMois">
+                    <input style="border-radius: 2rem 0rem 2rem 2rem;" type="number" class="form-control input-sm" id="nombreDeMois" placeholder="nombreDeMois" [(ngModel)]="this.nombreDeMois" name="nombreDeMois">
                 </div>
             </div>
             <div class="row">
                 <div class="form-group  col-12">
                     <label for="formGroupExampleInput">Type De Bouquet</label>
                     <select   style="border-radius: 2rem 0rem 2rem 2rem;" class="form-control input-sm" id="typeDeBouquet" placeholder="numero Carte" [(ngModel)]="this.typeDeBouquet" name="typeDeBouquet">
-                        <option _ngcontent-c9="">Maanaa</option>
-                        <option _ngcontent-c9="">Boul khool</option>
-                        <option _ngcontent-c9="">Maanaa + Boul khool</option>
+                        <option value="Maanaa" >Maanaa</option>
+                        <option value="Boul khool">Boul khool</option>
+                        <option value="Maanaa + Boul khool" >Maanaa + Boul khool</option>
                     </select>
                   </div>
             </div>
             <div class="row">
                 <div class="form-group  col-12">
-                    <input style="border-radius: 2rem 0rem 2rem 2rem; float:right;" type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="rechercher" (click)="etapetnt=3;modalRef.hide()">
+                    <input style="border-radius: 2rem 0rem 2rem 2rem; float:right;" type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="rechercher" (click)="modalRef.hide();tarifTntAbon();">
                 </div>
             </div>
         </div>
     </div>
   </ng-template>
+
+<div *ngIf="this.loading">
+    <app-loader></app-loader>
+</div>
