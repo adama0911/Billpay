@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import {LoaderComponent} from './loader/loader.component';
 import { TabsModule } from 'ngx-bootstrap';
 import { ModalModule } from 'ngx-bootstrap';
+import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
 import {TntService} from './Services/tnt.service';
 import {WizallService} from './Services/wizall.service';
@@ -28,7 +29,8 @@ import { from } from 'rxjs/internal/observable/from';
     FormsModule,
     HttpModule,
     TabsModule.forRoot(),
-    ModalModule.forRoot()
+    ModalModule.forRoot(),
+    AngularFontAwesomeModule
   ],
   providers: [
     TntService,

@@ -7,13 +7,14 @@ import { WizallService } from 'src/app/Services/wizall.service';
 import { OrangemoneyService } from 'src/app/Services/orangemoney.service';
 import { TigocashService } from 'src/app/Services/tigocash.service';
 import { ExpressocashService } from 'src/app/Services/expressocash.service';
+import { OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
   etapetnt=1;
   numero:any;
@@ -38,9 +39,17 @@ export class AppComponent {
   modalRef: BsModalRef;
   montant:any;
   token = "44387df398822d9f4076a390bf3566eb4c1b10606";
+  tntloading =false;
 
   constructor(private modalService: BsModalService, public tntCaller:TntService,private _postCashService: PostCashService, private _tntService:TntService, private _wizallService : WizallService, private _omService:OrangemoneyService, private _tcService: TigocashService, private expressocashwebservice : ExpressocashService) {}
  
+  ngOnInit (){
+      console.log(this.orangeNumberTest("776537639"));
+      console.log(this.orangeNumberTest("76653122"));
+      console.log(this.orangeNumberTest("7663122"));
+      console.log(this.orangeNumberTest("766531225"));
+  }
+
   reinitialiser (){
     this.montant=undefined;
     this.cni=undefined;
@@ -68,8 +77,7 @@ export class AppComponent {
 
   infoNumeroTnt(){
      console.log(this.numero);
-     this.loading = true ;
-     this.erreur = false ;
+     this.tntloading = true ;
      this.tntCaller.checkNumber(this.token, this.numero.toString()).then( response => {
          this.singleTntWS = response ;
          console.log(this.singleTntWS);
@@ -89,38 +97,46 @@ export class AppComponent {
  
          this.etapetnt=2;
  
-         this.loading = false ;
+         this.tntloading = false ;
      });
   }
 
   validerpaiementTnt(){
-      this.retirerOM();
+      // this.retirerOM();
       //this.cashOutWizall();
-      //let operateur = this.OrangeMoneyRadio || this.tigocashRadio || this.postcashRadio || this.wizallRadio || this.emoneyRadio;
+      let operateur = this.OrangeMoneyRadio | this.tigocashRadio | this.postcashRadio | this.wizallRadio | this.emoneyRadio;
       
-      // console.log(operateur);
+      console.log(operateur);
 
-      // switch(operateur){
-      //     case 1:
-      //           //OM
-      //           this.retirerOM();
-      //           break;
+      switch(operateur){
+            case 0:
+                this.erreur = "Vous devez choisir un paiment paiement";
+                break;
+          case 1:
+                //OM
+                this.retirerOM();
+                break;
 
-      //     case 2:
-      //           break;
+          case 2:
+                //TC
+                this.retraitTc();
+                break;
 
-      //     case 3:
-      //           //e-m
-      //           break;
+          case 3:
+                //e-m
+                this.faireretraitsimple();
+                break;
 
-      //     case 4:
-      //           //post
-      //           break;
+          case 4:
+                //post
+                this.validationretraitespece();
+                break;
                 
-      //     case 5:
-      //           //wIZALL
-      //           break;
-      // }
+          case 5:
+                //wIZALL
+                this.cashOutWizall();
+                break;
+      }
   }
 
 
@@ -133,13 +149,12 @@ export class AppComponent {
     if(this.typeDeBouquet == "Maanaa + Boul khool")
       typedebouquet=3;
 
-    this.loading = true ;
-    this.erreur = false ;
+    this.tntloading = true ;
 
     this.tntCaller.getTarifTntAbon({typedemande:'abonne',typedebouquet:typedebouquet,duree:this.nombreDeMois})
     .subscribe(
         data => {
-          this.loading = false;
+          this.tntloading = false;
 
           this.etapetnt=3;
           console.log(data);
@@ -165,7 +180,6 @@ export class AppComponent {
       typedebouquet=3;
 
     this.loading = true ;
-    this.erreur = false ;
 
     this.tntCaller.abonner(this.token, this.prenom,this.nom, this.tel,this.cni, this.numeroChip, this.numeroCarte, this.nombreDeMois, this.typeDeBouquet).then( response =>
       {
@@ -199,38 +213,36 @@ export class AppComponent {
  nbtour:number = 0;
  
  retraitTc(){
+  this.nbtour = 0;
   let requete = "2/"+this.numeroassocie+"/"+ this.montant ;
+
+  this.numeroassocie = undefined;
+  this.montant  = undefined;
+
   console.log(requete);
-  this.loading = true;
+  this.tntloading = true;
   this._tcService.requerirControllerTC(requete).then( resp => {
     if (resp.status==200){
 
       console.log("For this 'retrait', we just say : "+resp._body) ;
 
       if(resp._body.trim()=='0'){
-        this.erreur = "Erreur lors de l'operationde de retrait";
-        this.success = undefined;
-        this.loading = false;
+        this.erreur = this.retrieveOperationInfo(3,'0');
+
       }else
           if(resp._body.match('-12')){
-            this.erreur = "Erreur lors de l'operationde de retrait";
-            this.success = undefined;
-            this.loading = false;
+            this.erreur = this.retrieveOperationInfo(3,'1');
           }
           else
             this._tcService.verifierReponseTC(resp._body.trim().toString()).then(rep =>{
               let donnee=rep._body.trim().toString();
               console.log("Inside verifier retrait: "+donnee) ;
               if(donnee=='1'){
-                  this.success = "operation réussi !";
-                  this.erreur = undefined;
-                  this.loading = false;
+                this.erreur = this.retrieveOperationInfo(3,'1');
               }
               else{
                 if(donnee!='-1'){
-                    this.erreur = "Erreur lors de l'operationde de retrait";
-                    this.success = undefined;
-                    this.loading = false;
+                  this.erreur = this.retrieveOperationInfo(3,'-1');
                 }else{
                   let periodicVerifierTCRetirer = setInterval(()=>{
                     console.log("periodicVerifierTCRetirer : "+this.nbtour) ;
@@ -239,16 +251,16 @@ export class AppComponent {
                       let donnee=rep._body.trim().toString();
                       console.log("Inside verifier retrait: "+donnee) ;
                       if(donnee=='1'){
-                        this.success = "operation réussi !";
-                        this.erreur = undefined;
-                        this.loading = false;
+                        this.erreur = this.retrieveOperationInfo(3,'1');
+                        this.etapetnt=1;
+                        this.tntloading = false;
                          clearInterval(periodicVerifierTCRetirer) ;
                       }
                       else{
                         if(donnee!='-1'){
-                          this.erreur = "Erreur lors de l'operationde de retrait";
-                          this.success = undefined;
-                          this.loading = false;
+                          this.erreur = this.retrieveOperationInfo(3,'-1');
+                          this.etapetnt=1;
+                          this.tntloading = false;
                           clearInterval(periodicVerifierTCRetirer) ;
                         }
                         if(donnee=='-1' && this.nbtour>=100){
@@ -256,10 +268,10 @@ export class AppComponent {
                             console.log("demanderAnnulationTC : "+rep._body.trim().toString()) ;
                             let donnee=rep._body.trim().toString();
                             if(donnee=="c"){
-                                this.erreur = "Erreur lors de l'operationde de retrait";
-                                this.success = undefined;
-                                this.loading = false;
-                              clearInterval(periodicVerifierTCRetirer) ;
+                                this.erreur = this.retrieveOperationInfo(3,"c");
+                                this.etapetnt=1;
+                                this.tntloading = false;
+                                clearInterval(periodicVerifierTCRetirer) ;
                             }
                           }) ;
                         }
@@ -278,12 +290,16 @@ export class AppComponent {
 }
 
  retirerOM(){
-  console.log("*******************************")
- let requete = "2/"+this.numeroassocie+"/"+ 2;
- console.log(requete);
- this.loading = true ;
- this.erreur = false ;
+  console.log("*******************************");
+  this.nbtour = 0;
+ let requete = "2/"+this.numeroassocie+"/"+ this.montant;
 
+ this.numeroassocie = undefined;
+ this.montant  = undefined;
+ 
+ console.log(requete);
+ this.tntloading =true;
+ this.erreur =  undefined;
  this._omService.requerirControllerOM(requete).then( resp => {
    console.log(resp);
    if (resp.status==200){
@@ -291,25 +307,25 @@ export class AppComponent {
      console.log("For this 'retrait', we just say : "+resp._body) ;
 
      if(resp._body.trim()=='0'){
-          this.erreur = "Erreur lors de l'operationde de retrait";
-          this.success = undefined;
+          this.erreur = this.retrieveOperationInfo(2,'0');
+          this.tntloading =  false;
      }else
          if(resp._body.match('-12')){
-            this.erreur = "Erreur lors de l'operationde de retrait";
-            this.success = undefined;
+            this.erreur = this.retrieveOperationInfo(2,'-12');
+            this.tntloading =  false;
          }
          else
            this._omService.verifierReponseOM(resp._body.trim().toString()).then(rep =>{
              let donnee=rep._body.trim().toString();
              console.log("Inside verifier retrait: "+donnee) ;
              if(donnee=='1'){
-                this.erreur = undefined;
-                this.success = "operation réussi !";
+                this.erreur = "Opération réussi !";
+                this.tntloading =  false;
              }
              else{
                if(donnee!='-1'){
-                  this.erreur = "Erreur lors de l'operationde de retrait";
-                  this.success = undefined;
+                  this.erreur = this.retrieveOperationInfo(2,donnee);
+                  this.tntloading =  false;
                }else{
                    let periodicVerifierOMRetirer = setInterval(()=>{
                      this.nbtour = this.nbtour + 1 ;
@@ -317,23 +333,21 @@ export class AppComponent {
                      let donnee=rep._body.trim().toString();
                      console.log("Inside verifier retrait: "+donnee) ;
                      if(donnee=='1'){
-                            this.success = "operation réussi !";
-                            this.erreur = undefined;
+                        this.erreur = this.retrieveOperationInfo(2,donnee);
+                        this.tntloading =  false;
                      }
                      else{
                        if(donnee!='-1'){
-                            this.erreur = "Erreur lors de l'operationde de retrait";
-                            this.success = undefined;
-                            this.loading = false;
+                            this.erreur = this.retrieveOperationInfo(2,donnee);
+                            this.tntloading =false;   
                             clearInterval(periodicVerifierOMRetirer) ;
                        }
                          if(donnee=='-1' && this.nbtour>=75){
                            this._omService.demanderAnnulationOM(resp._body.trim().toString()).then(rep =>{
                              let donnee=rep._body.trim().toString();
                               if(donnee=="c"){
-                                this.erreur = "Erreur lors de l'operationde de retrait";
-                                this.success = undefined;
-                                this.loading = false;
+                                this.erreur = this.retrieveOperationInfo(2,donnee);
+                                this.tntloading =false;
                                 clearInterval(periodicVerifierOMRetirer) ;
                               }
                            });
@@ -354,29 +368,32 @@ export class AppComponent {
 //---------------  wizall ---------------
 cashOutWizall(){
   console.log('cashOutWizall');
+  this.tntloading = true;
   this._wizallService.intouchCashout(this.numeroassocie,this.montant).then( response =>{
     console.log("*************************") ;
     if(typeof response !== 'object') {
       this.erreur = "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client."
-      this.success = undefined;
+      this.tntloading = false;
     }
     else if(response.commission!=undefined){
-      this.erreur = undefined;
-      this.success = 'operation reussi avec success !';
+      this.erreur = 'operation reussi avec success !';
+      this.tntloading = false;
     }
     else{
       this.erreur = "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client."
-      this.success = undefined;
+      this.tntloading = false;
     }
+    this.tntloading = false;
   }).catch(response => {
     this.erreur = response;
-    this.success = undefined;
+    this.tntloading = false;
   });
 }
 
 infoRetraitsimple:any;
 //--------------e-money--------------------
 public faireretraitsimple(){
+  this.tntloading = true;
   this.expressocashwebservice.cashout(this.numeroassocie, this.montant).then(expressocashwebserviceList => {
      console.log(expressocashwebserviceList);
     if(!expressocashwebserviceList.match("cURL Error #:")){
@@ -384,6 +401,7 @@ public faireretraitsimple(){
       if(this.infoRetraitsimple.status==0){
         this.erreur = undefined;
         this.success = 'operation reussi avec success !';
+        
       }
       else{
         this.erreur = "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client."
@@ -394,7 +412,191 @@ public faireretraitsimple(){
       this.erreur = "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client."
       this.success = undefined;
     }
+    this.tntloading = false;
   });
 }
 
+//--------------PostCash -----------------
+
+validationretraitespece(){
+  console.log("validationretraitespeceaveccarte");
+  this.erreur =  undefined;
+  this.loading = true ;
+  this.erreur = false;
+  this._postCashService.retraitespece('00221'+this.numeroassocie+'',''+this.montant).then(postcashwebserviceList => {
+    this.loading = false ;
+    postcashwebserviceList = JSON.parse(postcashwebserviceList) ;
+    console.log(postcashwebserviceList);
+    if( (typeof postcashwebserviceList.errorCode != "undefined") && postcashwebserviceList.errorCode == "0" && postcashwebserviceList.errorMessage == ""){
+
+    }else{
+      this.erreur = true ;
+      this.erreur = postcashwebserviceList.errorMessage;
+    }
+  });
+}
+
+retrieveOperationInfo(operateur,errorCode) : string{
+
+  /* OM */
+       if(operateur==2 ){
+  
+          if (errorCode=='r')
+            return "Vous venez d'effectuer la même opèration sur le même numéro." ;
+  
+          if (errorCode=='c')
+            return "Opèration annulée. La requête n'est pas parvenue au serveur. Veuillez recommencer." ;
+  
+          if (errorCode=='0')
+            return "Vous n'êtes pas autorisé à effectuer cette opèration." ;
+  
+          if (errorCode=='-2')
+            return "Vous avez atteint le nombre maximum de transactions par jour en tant que beneficiaire" ;
+          if (errorCode=='-3')
+            return "Le solde de votre compte ne vous permet pas d'effectuer cette opèration" ;
+          if (errorCode=='-4')
+            return "Le beneficiaire a atteint le montant maximum autorisé par mois" ;
+          if (errorCode=='-5')
+            return "Le montant maximum cumulé de transactions par semaine en tant que beneficiaire a ete atteint par le client" ;
+          if (errorCode=='-6')
+            return "Le destinataire n'est pas un client orangemoney" ;
+          if (errorCode=='-7')
+            return "Probléme de connexion ou code IHM invalide. Veuillez réessayer!" ;
+          if (errorCode=='-8')
+            return "Le client a atteint le nombre maximum de transactions par semaine en tant que beneficiaire" ;
+          if (errorCode=='-9')
+            return "Le client a atteint le nombre maximum de transactions par mois en tant que beneficiaire" ;
+  
+  //        if (errorCode=='-10')
+   //         return "Votre requête n'a pas pu être traitée. Vérifiez la conformité des informations saisies!" ;
+  
+          if (errorCode=='-12')
+            return "Service actuellement indisponible. Veuillez réessayer plus tard." ;
+  
+          if (errorCode=='-13')
+            return "Le code de retrait saisi est incorrect. Veuillez recommencer!" ;
+  
+         return "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client." ;
+      }
+  
+  /* TC */
+       if(operateur==3 ){
+  
+          if (errorCode=='r')
+            return "Vous venez d'effectuer la même opèration sur le même numéro." ;
+  
+          if (errorCode=='c')
+            return "Opèration annulée. La requête n'est pas parvenue au serveur. Veuillez recommencer." ;
+  
+          if (errorCode=='0')
+            return "Vous n'êtes pas autorisé à effectuer cette opèration." ;
+  
+          if (errorCode=='-2')
+            return "Numéro Invalide." ;
+          if (errorCode=='-3')
+            return "Le compte de l'utilisateur ne dispose pas de permissions suffisantes pour recevoir un dépot." ;
+          if (errorCode=='-4')
+            return "Le beneficiaire a atteint le montant maximum autorisé par mois" ;
+          if (errorCode=='-5')
+            return "Le montant maximum cumulé de transactions par semaine en tant que beneficiaire a ete atteint par le client" ;
+          if (errorCode=='-6')
+            return "Le destinataire n'est pas un client orangemoney" ;
+          if (errorCode=='-7')
+            return "Probléme de connexion ou code IHM invalide. Veuillez réessayer!" ;
+          if (errorCode=='-8')
+            return "Vous avez atteint le nombre maximum de transactions par semaine en tant que beneficiaire" ;
+          if (errorCode=='-9')
+            return "Vous avez atteint le nombre maximum de transactions par mois en tant que beneficiaire" ;
+  
+  //        if (errorCode=='-10')
+   //         return "Votre requête n'a pas pu être traitée. Vérifiez la conformité des informations saisies!" ;
+  
+          if (errorCode=='-12')
+            return "Service actuellement indisponible. Veuillez réessayer plus tard." ;
+  
+          if (errorCode=='-13')
+            return "Le code de retrait saisi est incorrect. Veuillez recommencer!" ;
+  
+         return "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client." ;
+      }
+  
+  
+       if(operateur==4 ){
+  
+          if (errorCode=='0')
+            return "Vous n'êtes pas autorisé à effectuer cette opèration." ;
+         return "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client." ;
+      }
+  
+      /* WIZALL */
+      if(operateur==6 ){
+        if (errorCode=='-12' || errorCode==-12)
+          return "Impossible de se connecter au serveur du partenaire. Merci de contacter le service client.";
+        else if (errorCode=='-11' || errorCode==-11)
+          return "Opèration annulée. La requête n'est pas parvenue au serveur. Merci de contacter le service client." ;
+        else if (errorCode=='-1' || errorCode==-1)
+          return "Impossible de se connecter au serveur du partenaire. Merci de réessayer plus tard." ;
+        else if (errorCode=='500' || errorCode==500)
+          return "Une erreur a empêché le traitement de votre requête. Réessayez plus tard ou contactez le service client." ;
+        else if (errorCode=='400' || errorCode==400)
+          return "Facture dèja payée." ;
+        else if (errorCode && (typeof errorCode == 'string'))
+          return errorCode;
+        return "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client." ;
+      }
+  
+      /* EXPRESSO */
+      if(operateur==7 ){
+  
+        if (errorCode=='-1' || errorCode=='1')
+          return "Impossible de se connecter au serveur du partenaire. Merci de réessayer plus tard." ;
+        if (errorCode=='2')
+          return "Cette requête n'est pas authorisée" ;
+        if (errorCode=='51')
+          return "Le numéro du destinataire n'est pas authorisé à recevoir de transfert." ;
+        if (errorCode=='3')
+          return "Numéro de téléphone invalide." ;
+        if (errorCode=='2')
+          return "Cette requête n'est pas authorisée" ;
+        if (errorCode=='7')
+          return "Votre compte a été verrouillé, contactez le service client." ;
+        if (errorCode=='9')
+          return "Votre compte est à l'état inactif." ;
+  
+        return "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client." ;
+      }
+  
+      /* FACTURIER */
+      if(operateur==8 ){
+        if (errorCode=='-12' || errorCode==-12)
+          return "Impossible de se connecter au serveur du partenaire. Merci de contacter le service client.";
+        else if (errorCode=='-11' || errorCode==-11)
+          return "Opèration annulée. La requête n'est pas parvenue au serveur. Merci de contacter le service client." ;
+        else if (errorCode=='-1' || errorCode==-1)
+          return "Impossible de se connecter au serveur du partenaire. Merci de réessayer plus tard." ;
+        else if (errorCode && (typeof errorCode == 'string')) return errorCode;
+        return "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client." ;
+      }
+  
+  
+    }
+  
+    orangeNumberTest(numb:string){
+        let  re= new RegExp("^7[7-8]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}$");
+        return re.test(numb);
+    }
+
+    tigoNumberTest (numb:string){
+        let  re= new RegExp("^76[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}$");
+        return re.test(numb);
+    }
+
+    expressoNumberTest (numb:string){
+      let  re= new RegExp("^70[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}$");
+      return re.test(numb);
+    }
+    numberTest (numb:string){
+      let  re= new RegExp("^7[0768]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}$");
+      return re.test(numb);
+    }
 }

@@ -4,13 +4,16 @@
   </div> -->
   <div class="row">
       <tabset #staticTabs style="width:100%; text-align:center;">
-          <tab heading="TNT <span> Salut</span>">
+          <tab heading="TNT">
+                <i  *ngIf=" tntloading==true" class="fa fa-spinner fa-pulse fa-3x fa-fw" ></i>
+
                 <div class="col-12" *ngIf="erreur!='undefined'" style="color:red;">
                         {{this.erreur}}
                 </div>
                 <div class="col-12" *ngIf="sucess!='undefined'" style="color:red;">
                         {{this.success}}
                 </div>
+               
                 <div class="col-12" *ngIf="etapetnt==1">
                     <form  style="width:50%; margin-left:25%; margin-top:4%; border: 1px solid #36a9e0;padding: 8%;border-radius: 4rem 0rem;">
                         <div class="form-group">
@@ -18,7 +21,7 @@
                           <input style="border-radius: 2rem 0rem 2rem 2rem;" stype="text" class="form-control input-sm" id="numero" placeholder="numero" [(ngModel)]="this.numero" name="numero">
                         </div>
                         <div class="form-group">
-                          <input style="border-radius: 2rem 0rem 2rem 2rem; margin-top: 8%;" type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="rechercher" (click)="infoNumeroTnt()">
+                          <input [disabled]=" !this.numero" style="border-radius: 2rem 0rem 2rem 2rem; margin-top: 8%;" type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="rechercher" (click)="infoNumeroTnt()">
                         </div>
                       </form>
                 </div>
@@ -28,38 +31,38 @@
                         <div class="col-6">
                             <div class="form-group">
                                 <label for="formGroupExampleInput">Nom Client</label>
-                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="nom" placeholder="nom" [(ngModel)]="this.nom" name="nom">
+                                <input [disabled]="true" style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="nom" placeholder="nom" [(ngModel)]="this.nom" name="nom">
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="form-group">
                                 <label for="formGroupExampleInput">Prénom Client</label>
-                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="prenom" placeholder="prenom" [(ngModel)]="this.prenom" name="prenom">
+                                <input [disabled]="true" style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="prenom" placeholder="prenom" [(ngModel)]="this.prenom" name="prenom">
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="form-group">
                                 <label for="formGroupExampleInput">Téléphone Client</label>
-                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="tel" placeholder="tel" [(ngModel)]="this.tel" name="tel">
+                                <input [disabled]="true" style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="tel" placeholder="tel" [(ngModel)]="this.tel" name="tel">
                             </div>
                         </div>
   
                         <div class="col-6">
                             <div class="form-group">
                                 <label for="formGroupExampleInput">Numéro Chip </label>
-                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="numeroChip" placeholder="numeroChip" [(ngModel)]="this.numeroChip" name="numeroChip">
+                                <input [disabled]="true" style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="numeroChip" placeholder="numeroChip" [(ngModel)]="this.numeroChip" name="numeroChip">
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="formGroupExampleInput">Numéro Carte</label>
-                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="numeroCarte" placeholder="numeroCarte" [(ngModel)]="this.numeroCarte" name="numeroCarte">
+                                <input [disabled]="true" style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="numeroCarte" placeholder="numeroCarte" [(ngModel)]="this.numeroCarte" name="numeroCarte">
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="button" class="btn btn-default btn-sm" id="formGroupExampleInput2" value="retoure" (click)="etapetnt=1">
+                                <input  style="border-radius: 2rem 0rem 2rem 2rem;" type="button" class="btn btn-default btn-sm" id="formGroupExampleInput2" value="retoure" (click)="etapetnt=1; this.erreur='undefined'">
                                 <input style="border-radius: 2rem 0rem 2rem 2rem; margin-left: 6%;" type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="valider" (click)="openModal(template)">
                             </div>
                         </div>
@@ -81,31 +84,31 @@
                                     <div class="col-12">
                                         <form style="width: 100%;">
                                             <div class="form-check form-check-inline" style="width: 100%;">
-                                                <input  [(ngModel)]="this.OrangeMoneyRadio" class="form-check-input" type="radio" name="modedepaiement" id="OrangeMoneyRadio" value="1" checked>
+                                                <input  [(ngModel)]="this.OrangeMoneyRadio" class="form-check-input" type="radio" name="modedepaiement" id="modedepaiement" value="1" checked>
                                                 <label class="form-check-label" for="OrangeMoney">
                                                     Orange Money
                                                 </label>
                                             </div>
                                             <div class="form-check form-check-inline" style="width: 100%;">
-                                                <input [(ngModel)]="this.tigocashRadio" class="form-check-input" type="radio" name="modedepaiement" id="tigocashRadio" value="2">
+                                                <input [(ngModel)]="this.tigocashRadio" class="form-check-input" type="radio" name="modedepaiement" id="modedepaiement" value="2">
                                                 <label class="form-check-label" for="tigocashRadio">
                                                     Tiguo Cash
                                                 </label>
                                             </div>
                                             <div class="form-check form-check-inline" style="width: 100%;">
-                                                <input  [(ngModel)]="this.emoneyRadio" class="form-check-input" type="radio" name="modedepaiement" id="emoneyRadio" value="3">
+                                                <input  [(ngModel)]="this.emoneyRadio" class="form-check-input" type="radio" name="modedepaiement" id="modedepaiement" value="3">
                                                 <label class="form-check-label" for="emoneyRadio">
                                                     E-MONEY
                                                 </label>
                                             </div>
                                             <div class="form-check form-check-inline" style="width: 100%;">
-                                                <input [(ngModel)]="this.postcashRadio" class="form-check-input" type="radio" name="modedepaiement" id="postcashRadio" value="4">
+                                                <input [(ngModel)]="this.postcashRadio" class="form-check-input" type="radio" name="modedepaiement" id="modedepaiement" value="4">
                                                 <label class="form-check-label" for="postcashRadio">
                                                     POSTCASH
                                                 </label>
                                             </div>
                                             <div class="form-check form-check-inline" style="width: 100%;">
-                                                <input [(ngModel)]="this.wizallRadio" class="form-check-input" type="radio" name="modedepaiement" id="wizallRadio" value="5">
+                                                <input [(ngModel)]="this.wizallRadio" class="form-check-input" type="radio" name="modedepaiement" id="modedepaiement" value="5">
                                                 <label class="form-check-label" for="wizallRadio">
                                                     WIZALL
                                                 </label>
@@ -121,14 +124,14 @@
                                     <label for="formGroupExampleInput">Numéro Associé</label>
                                 </div>
                                 <div class="col-7">
-                                    <input style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="numeroassocie" placeholder="numeroassocie" [(ngModel)]="this.numeroassocie" name="numeroassocie">
+                                    <input [disabled]="!this.wizallRadio && !this.postcashRadio && !this.emoneyRadio && !this.OrangeMoneyRadio" style="border-radius: 2rem 0rem 2rem 2rem;" type="text" class="form-control input-sm" id="numeroassocie" placeholder="numeroassocie" [(ngModel)]="this.numeroassocie" name="numeroassocie">
                                 </div>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <input style="border-radius: 2rem 0rem 2rem 2rem;" type="button" class="btn btn-default btn-sm" id="formGroupExampleInput2" value="retoure" (click)="etapetnt=2">
-                                <input style="border-radius: 2rem 0rem 2rem 2rem;    margin-left: 6%; " type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="valider" (click)="validerpaiementTnt();">
+                                <input  style="border-radius: 2rem 0rem 2rem 2rem;" type="button" class="btn btn-default btn-sm" id="formGroupExampleInput2" value="retoure" (click)="etapetnt=2; this.erreur='undefined'">
+                                <input [disabled]="(!this.wizallRadio && !this.postcashRadio && !this.emoneyRadio && !this.OrangeMoneyRadio) || !numberTest(this.numeroassocie)" style="border-radius: 2rem 0rem 2rem 2rem;    margin-left: 6%; " type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="valider" (click)="validerpaiementTnt();">
                             </div>
                         </div>
                       </form>
@@ -173,7 +176,7 @@
             </div>
             <div class="row">
                 <div class="form-group  col-12">
-                    <input style="border-radius: 2rem 0rem 2rem 2rem; float:right;" type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="rechercher" (click)="modalRef.hide();tarifTntAbon();">
+                    <input [disabled]="!this.nombreDeMois || !this.typeDeBouquet" style="border-radius: 2rem 0rem 2rem 2rem; float:right;" type="button" class="btn btn-success btn-sm" id="formGroupExampleInput2" value="valider" (click)="modalRef.hide();tarifTntAbon();">
                 </div>
             </div>
         </div>
