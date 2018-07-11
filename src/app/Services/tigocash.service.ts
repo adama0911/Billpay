@@ -14,7 +14,7 @@ export class TigocashService {
   private link = "https://mysentool.pro/index.php";
 
   private headers=new Headers();
-  private token : string = "44387df398822d9f4076a390bf3566eb4c1b10606" ;
+  private token:string =  "44387df398822d9f4076a390bf3566eb4c1b10606";
   public datas:any;
 
 

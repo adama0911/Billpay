@@ -14,7 +14,7 @@ export class OrangemoneyService {
   private link = "https://mysentool.pro/index.php";
 
   private headers=new Headers();
-  private token : "4e903c83bedf44f1c4662e1f65cc5e6fdc1d5b52a" ;
+  private token:string =  "44387df398822d9f4076a390bf3566eb4c1b10606";
   public datas:any;
 
 
@@ -46,6 +46,5 @@ export class OrangemoneyService {
     let link=this.link+"/om-sen/isDepotCheckAuthorized";
     return this.http.post(link,params,{headers:this.headers}).toPromise().then( res => {return res} ).catch(error => {return 'bad' });
   }
-
 
 }

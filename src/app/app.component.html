@@ -4,7 +4,7 @@
   </div> -->
   <div class="row">
       <tabset #staticTabs style="width:100%; text-align:center;">
-          <tab heading="TNT">
+          <tab heading="TNT <span> Salut</span>">
                 <div class="col-12" *ngIf="erreur!='undefined'" style="color:red;">
                         {{this.erreur}}
                 </div>
@@ -180,6 +180,6 @@
     </div>
   </ng-template>
 
-<div *ngIf="this.loading">
+<div *ngIf="this.loading==true">
     <app-loader></app-loader>
 </div>

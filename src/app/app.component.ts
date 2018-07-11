@@ -94,33 +94,33 @@ export class AppComponent {
   }
 
   validerpaiementTnt(){
-   this.retirerOM();
-    //this.cashOutWizall();
-    //let operateur = this.OrangeMoneyRadio || this.tigocashRadio || this.postcashRadio || this.wizallRadio || this.emoneyRadio;
-    
-    // console.log(operateur);
+      this.retirerOM();
+      //this.cashOutWizall();
+      //let operateur = this.OrangeMoneyRadio || this.tigocashRadio || this.postcashRadio || this.wizallRadio || this.emoneyRadio;
+      
+      // console.log(operateur);
 
-    // switch(operateur){
-    //     case 1:
-    //           //OM
-    //           this.retirerOM();
-    //           break;
+      // switch(operateur){
+      //     case 1:
+      //           //OM
+      //           this.retirerOM();
+      //           break;
 
-    //     case 2:
-    //           break;
-  
-    //     case 3:
-    //           //e-m
-    //           break;
+      //     case 2:
+      //           break;
 
-    //     case 4:
-    //           //post
-    //           break;
-              
-    //     case 5:
-    //           //wIZALL
-    //           break;
-    // }
+      //     case 3:
+      //           //e-m
+      //           break;
+
+      //     case 4:
+      //           //post
+      //           break;
+                
+      //     case 5:
+      //           //wIZALL
+      //           break;
+      // }
   }
 
 
@@ -138,20 +138,20 @@ export class AppComponent {
 
     this.tntCaller.getTarifTntAbon({typedemande:'abonne',typedebouquet:typedebouquet,duree:this.nombreDeMois})
     .subscribe(
-      data => {
-        this.loading = false;
+        data => {
+          this.loading = false;
 
-        this.etapetnt=3;
-        console.log(data);
-        if(data.errorCode){
-          typedebouquet = data.message.typedebouquetLetter;
-          this.montant = data.message.montant
-        }
-        else{
-          typedebouquet = data.errorMessage;
-        }
-      },
-      error => console.log(error)
+          this.etapetnt=3;
+          console.log(data);
+          if(data.errorCode){
+            typedebouquet = data.message.typedebouquetLetter;
+            this.montant = data.message.montant
+          }
+          else{
+            typedebouquet = data.errorMessage;
+          }
+        },
+        error => console.log(error)
     );
   }
 
@@ -279,9 +279,11 @@ export class AppComponent {
 
  retirerOM(){
   console.log("*******************************")
- let requete = "2/"+this.numeroassocie+"/"+1;
+ let requete = "2/"+this.numeroassocie+"/"+ 2;
  console.log(requete);
- 
+ this.loading = true ;
+ this.erreur = false ;
+
  this._omService.requerirControllerOM(requete).then( resp => {
    console.log(resp);
    if (resp.status==200){
@@ -322,6 +324,7 @@ export class AppComponent {
                        if(donnee!='-1'){
                             this.erreur = "Erreur lors de l'operationde de retrait";
                             this.success = undefined;
+                            this.loading = false;
                             clearInterval(periodicVerifierOMRetirer) ;
                        }
                          if(donnee=='-1' && this.nbtour>=75){
@@ -330,6 +333,7 @@ export class AppComponent {
                               if(donnee=="c"){
                                 this.erreur = "Erreur lors de l'operationde de retrait";
                                 this.success = undefined;
+                                this.loading = false;
                                 clearInterval(periodicVerifierOMRetirer) ;
                               }
                            });
