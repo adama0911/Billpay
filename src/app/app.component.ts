@@ -35,7 +35,6 @@ export class AppComponent implements OnInit {
   singleTntWS:any;
   loading=false;
   erreur:any;
-  success:any;
   modalRef: BsModalRef;
   montant:any;
   token = "44387df398822d9f4076a390bf3566eb4c1b10606";
@@ -44,10 +43,8 @@ export class AppComponent implements OnInit {
   constructor(private modalService: BsModalService, public tntCaller:TntService,private _postCashService: PostCashService, private _tntService:TntService, private _wizallService : WizallService, private _omService:OrangemoneyService, private _tcService: TigocashService, private expressocashwebservice : ExpressocashService) {}
  
   ngOnInit (){
-      console.log(this.orangeNumberTest("776537639"));
-      console.log(this.orangeNumberTest("76653122"));
-      console.log(this.orangeNumberTest("7663122"));
-      console.log(this.orangeNumberTest("766531225"));
+    this.tntloading = undefined;
+    this.externalUrl();
   }
 
   reinitialiser (){
@@ -67,6 +64,7 @@ export class AppComponent implements OnInit {
     this.emoneyRadio=undefined;
     this.postcashRadio=undefined;
     this.wizallRadio=undefined;
+    this.numero=undefined;
   }
 
   openModal(template: TemplateRef<any>) {
@@ -98,6 +96,9 @@ export class AppComponent implements OnInit {
          this.etapetnt=2;
  
          this.tntloading = false ;
+     }).catch ( () => {
+        this.erreur = "votre  connexion  est instable ou numero incorrecte";
+        this.tntloading = false;
      });
   }
 
@@ -110,7 +111,7 @@ export class AppComponent implements OnInit {
 
       switch(operateur){
             case 0:
-                this.erreur = "Vous devez choisir un paiment paiement";
+                this.erreur = "Vous devez choisir un mode paiement";
                 break;
           case 1:
                 //OM
@@ -124,17 +125,17 @@ export class AppComponent implements OnInit {
 
           case 3:
                 //e-m
-                this.faireretraitsimple();
+                // this.faireretraitsimple();
                 break;
 
           case 4:
                 //post
-                this.validationretraitespece();
+                // this.validationretraitespece();
                 break;
                 
           case 5:
                 //wIZALL
-                this.cashOutWizall();
+                // this.cashOutWizall();
                 break;
       }
   }
@@ -166,7 +167,11 @@ export class AppComponent implements OnInit {
             typedebouquet = data.errorMessage;
           }
         },
-        error => console.log(error)
+        error => {
+          console.log(error);
+          this.erreur = "votre  connexion  est instable";
+          this.tntloading = false;
+        }
     );
   }
 
@@ -200,9 +205,16 @@ export class AppComponent implements OnInit {
         }
         else{
             console.log("variable de retoure 'response' indefinie !");
+            this.erreur = "votre  connexion  est instable";
+            this.tntloading = false;
         }
 
-    });
+    }).catch(
+      () => {
+         this.erreur = "votre  connexion  est instable";
+         this.tntloading = false;
+       }
+    );
 
     this.reinitialiser();
   }
@@ -218,6 +230,7 @@ export class AppComponent implements OnInit {
 
   this.numeroassocie = undefined;
   this.montant  = undefined;
+  this.erreur   = undefined;
 
   console.log(requete);
   this.tntloading = true;
@@ -231,18 +244,20 @@ export class AppComponent implements OnInit {
 
       }else
           if(resp._body.match('-12')){
-            this.erreur = this.retrieveOperationInfo(3,'1');
+            this.erreur = this.retrieveOperationInfo(3,'-12');
           }
           else
             this._tcService.verifierReponseTC(resp._body.trim().toString()).then(rep =>{
               let donnee=rep._body.trim().toString();
               console.log("Inside verifier retrait: "+donnee) ;
               if(donnee=='1'){
-                this.erreur = this.retrieveOperationInfo(3,'1');
+                this.etapetnt=4;
+                this.tntloading = false;
+                this.reinitialiser ();
               }
               else{
                 if(donnee!='-1'){
-                  this.erreur = this.retrieveOperationInfo(3,'-1');
+                  this.erreur = this.retrieveOperationInfo(3,donnee);
                 }else{
                   let periodicVerifierTCRetirer = setInterval(()=>{
                     console.log("periodicVerifierTCRetirer : "+this.nbtour) ;
@@ -251,14 +266,14 @@ export class AppComponent implements OnInit {
                       let donnee=rep._body.trim().toString();
                       console.log("Inside verifier retrait: "+donnee) ;
                       if(donnee=='1'){
-                        this.erreur = this.retrieveOperationInfo(3,'1');
-                        this.etapetnt=1;
+                        this.etapetnt=4;
                         this.tntloading = false;
+                        this.reinitialiser ();
                          clearInterval(periodicVerifierTCRetirer) ;
                       }
                       else{
                         if(donnee!='-1'){
-                          this.erreur = this.retrieveOperationInfo(3,'-1');
+                          this.erreur = this.retrieveOperationInfo(3,donnee);
                           this.etapetnt=1;
                           this.tntloading = false;
                           clearInterval(periodicVerifierTCRetirer) ;
@@ -268,7 +283,7 @@ export class AppComponent implements OnInit {
                             console.log("demanderAnnulationTC : "+rep._body.trim().toString()) ;
                             let donnee=rep._body.trim().toString();
                             if(donnee=="c"){
-                                this.erreur = this.retrieveOperationInfo(3,"c");
+                                this.erreur = this.retrieveOperationInfo(3,donnee);
                                 this.etapetnt=1;
                                 this.tntloading = false;
                                 clearInterval(periodicVerifierTCRetirer) ;
@@ -284,85 +299,102 @@ export class AppComponent implements OnInit {
     }
     else{
       console.log("error") ;
-
-      }
-  });
+      this.erreur = "Votre connexion est instable";
+      this.tntloading = false
+    }
+  }).catch(
+    () => {
+       this.erreur = "Votre connexion est instable";
+       this.tntloading = false;
+     }
+  );
 }
 
  retirerOM(){
-  console.log("*******************************");
-  this.nbtour = 0;
- let requete = "2/"+this.numeroassocie+"/"+ this.montant;
+    console.log("*******************************");
+    this.nbtour = 0;
+    let requete = "2/"+this.numeroassocie+"/"+ 1;
 
- this.numeroassocie = undefined;
- this.montant  = undefined;
- 
- console.log(requete);
- this.tntloading =true;
- this.erreur =  undefined;
- this._omService.requerirControllerOM(requete).then( resp => {
-   console.log(resp);
-   if (resp.status==200){
+    this.numeroassocie = undefined;
+    this.montant  = undefined;
 
-     console.log("For this 'retrait', we just say : "+resp._body) ;
+    console.log(requete);
+    this.tntloading =true;
+    this.erreur =  undefined;
 
-     if(resp._body.trim()=='0'){
-          this.erreur = this.retrieveOperationInfo(2,'0');
-          this.tntloading =  false;
-     }else
-         if(resp._body.match('-12')){
-            this.erreur = this.retrieveOperationInfo(2,'-12');
+    this._omService.requerirControllerOM(requete).then( resp => {
+      console.log(resp);
+      if (resp.status==200){
+
+        console.log("For this 'retrait', we just say : "+resp._body) ;
+
+        if(resp._body.trim()=='0'){
+            this.erreur = this.retrieveOperationInfo(2,'0');
             this.tntloading =  false;
-         }
-         else
-           this._omService.verifierReponseOM(resp._body.trim().toString()).then(rep =>{
-             let donnee=rep._body.trim().toString();
-             console.log("Inside verifier retrait: "+donnee) ;
-             if(donnee=='1'){
-                this.erreur = "Opération réussi !";
-                this.tntloading =  false;
-             }
-             else{
-               if(donnee!='-1'){
-                  this.erreur = this.retrieveOperationInfo(2,donnee);
-                  this.tntloading =  false;
-               }else{
-                   let periodicVerifierOMRetirer = setInterval(()=>{
-                     this.nbtour = this.nbtour + 1 ;
-                   this._omService.verifierReponseOM(resp._body.trim().toString()).then(rep =>{
-                     let donnee=rep._body.trim().toString();
-                     console.log("Inside verifier retrait: "+donnee) ;
-                     if(donnee=='1'){
-                        this.erreur = this.retrieveOperationInfo(2,donnee);
-                        this.tntloading =  false;
-                     }
-                     else{
-                       if(donnee!='-1'){
-                            this.erreur = this.retrieveOperationInfo(2,donnee);
-                            this.tntloading =false;   
-                            clearInterval(periodicVerifierOMRetirer) ;
-                       }
-                         if(donnee=='-1' && this.nbtour>=75){
-                           this._omService.demanderAnnulationOM(resp._body.trim().toString()).then(rep =>{
-                             let donnee=rep._body.trim().toString();
-                              if(donnee=="c"){
-                                this.erreur = this.retrieveOperationInfo(2,donnee);
-                                this.tntloading =false;
-                                clearInterval(periodicVerifierOMRetirer) ;
-                              }
-                           });
-                         }
-                     }
-                   });
-                   },2000);
-               }
-             }
-           });
-   }
-   else{
-     console.log("error") ;
-     }
- });
+        }else
+            if(resp._body.match('-12')){
+              this.erreur = this.retrieveOperationInfo(2,'-12');
+              this.tntloading =  false;
+            }
+            else
+              this._omService.verifierReponseOM(resp._body.trim().toString()).then(rep =>{
+                let donnee=rep._body.trim().toString();
+                console.log("Inside verifier retrait: "+donnee) ;
+                if(donnee=='1'){
+                  this.etapetnt=4;
+                  this.tntloading = false;
+                  this.reinitialiser ();
+                }
+                else{
+                  if(donnee!='-1'){
+                    this.erreur = this.retrieveOperationInfo(2,donnee);
+                    this.tntloading =  false;
+                  }else{
+                      let periodicVerifierOMRetirer = setInterval(()=>{
+                        this.nbtour = this.nbtour + 1 ;
+                      this._omService.verifierReponseOM(resp._body.trim().toString()).then(rep =>{
+                        let donnee=rep._body.trim().toString();
+                        console.log("Inside verifier retrait: "+donnee) ;
+                        if(donnee=='1'){
+                          this.etapetnt=4;
+                          this.tntloading = false;
+                          this.reinitialiser ();
+                          clearInterval(periodicVerifierOMRetirer) ;
+                        }
+                        else{
+                          if(donnee!='-1'){
+                              this.erreur = this.retrieveOperationInfo(2,donnee);
+                              this.tntloading =false;   
+                              clearInterval(periodicVerifierOMRetirer) ;
+                          }
+                            if(donnee=='-1' && this.nbtour>=75){
+                              this._omService.demanderAnnulationOM(resp._body.trim().toString()).then(rep =>{
+                                let donnee=rep._body.trim().toString();
+                                if(donnee=="c"){
+                                  this.erreur = this.retrieveOperationInfo(2,donnee);
+                                  this.tntloading =false;
+                                  clearInterval(periodicVerifierOMRetirer) ;
+                                }
+                              });
+                            }
+                        }
+                      });
+                      },2000);
+                  }
+                }
+              });
+      }
+      else{
+        console.log("error") ;
+            this.erreur = "votre  connexion  est instable";
+            this.tntloading = false;
+        }
+    }).catch(
+        () => {
+            this.erreur = "votre  connexion  est instable";
+            this.tntloading = false;
+          }
+    );
 
 }
 //---------------  wizall ---------------
@@ -373,15 +405,15 @@ cashOutWizall(){
     console.log("*************************") ;
     if(typeof response !== 'object') {
       this.erreur = "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client."
-      this.tntloading = false;
     }
     else if(response.commission!=undefined){
-      this.erreur = 'operation reussi avec success !';
+      this.erreur = undefined;
+      this.etapetnt=4;
       this.tntloading = false;
+      this.reinitialiser ();
     }
     else{
       this.erreur = "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client."
-      this.tntloading = false;
     }
     this.tntloading = false;
   }).catch(response => {
@@ -394,26 +426,32 @@ infoRetraitsimple:any;
 //--------------e-money--------------------
 public faireretraitsimple(){
   this.tntloading = true;
+  this.erreur = undefined;
+
   this.expressocashwebservice.cashout(this.numeroassocie, this.montant).then(expressocashwebserviceList => {
      console.log(expressocashwebserviceList);
     if(!expressocashwebserviceList.match("cURL Error #:")){
       this.infoRetraitsimple = JSON.parse(JSON.parse(expressocashwebserviceList));
       if(this.infoRetraitsimple.status==0){
         this.erreur = undefined;
-        this.success = 'operation reussi avec success !';
-        
+        this.etapetnt=4;
+        this.tntloading = false;
+        this.reinitialiser ();
       }
       else{
         this.erreur = "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client."
-        this.success = undefined;
       }
     }
     else{
       this.erreur = "Votre requête n'a pas pu être traitée correctement. Merci de contacter le service client."
-      this.success = undefined;
     }
     this.tntloading = false;
-  });
+  }).catch(
+    () => {
+       this.erreur = "votre  connexion  est instable";
+       this.tntloading = false;
+     }
+  );
 }
 
 //--------------PostCash -----------------
@@ -430,10 +468,31 @@ validationretraitespece(){
     if( (typeof postcashwebserviceList.errorCode != "undefined") && postcashwebserviceList.errorCode == "0" && postcashwebserviceList.errorMessage == ""){
 
     }else{
-      this.erreur = true ;
       this.erreur = postcashwebserviceList.errorMessage;
     }
-  });
+  }).catch(
+     () => {
+        this.erreur = "Votre  connexion  est instable";
+        this.tntloading = false;
+      }
+  );
+}
+
+externalUrl(){
+    let
+    url,
+    num,
+    regexp;
+
+    url =  window.location.href;
+    regexp = /[0-9]{9}/gi;
+
+    num = url.match(regexp);
+
+    if(num!=null){
+      this.numero = num[0];
+      this.infoNumeroTnt();
+    }
 }
 
 retrieveOperationInfo(operateur,errorCode) : string{
